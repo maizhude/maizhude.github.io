@@ -8,7 +8,7 @@ header-img: img/post-bg-cook.jpg
 catalog: true
 tags:
     - ns3
-    -SDN
+    - SDN
 ---
 
 ## 1、安装依赖
