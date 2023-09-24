@@ -1,6 +1,6 @@
 ---
 layout:     post
-title: ns3.34安装ofswitch13（基于BOFUSS库的openflow13）教程
+title: ns3_34安装ofswitch13（基于BOFUSS库的openflow13）教程
 subtitle:  ns3
 date:       2023-8-20
 author:     MZ
