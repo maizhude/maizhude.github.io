@@ -1,6 +1,6 @@
 ---
 layout:     post
-title:     : TCCS实现之修改ryu和ovs源码实现自定义action
+title:     TCCS实现之修改ryu和ovs源码实现自定义action
 subtitle:  TCCS实现
 date:       2023-3-25
 author:     MZ
