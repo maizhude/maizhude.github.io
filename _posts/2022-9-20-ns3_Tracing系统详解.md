@@ -1,7 +1,13 @@
 ---
-title: ns-3 Tracing系统详解
-date: 2022-10-08 16:46:53
+layout:     post
+title:     ns3 Tracing系统详解
+subtitle:  ns3
+date:       2022-9-20
+author:     MZ
+header-img: img/post-bg-2015.jpg
+catalog: true
 tags:
+    - ns3
 ---
 
 ## 一、为什么要设置Tracing系统
@@ -144,7 +150,7 @@ Ptr<MobilityModel> mobilityModel = node->GetObject<MobilityModel> ()
   - All Attributes（所有属性）
   - All GlobalValues（所有全局变量）
 
-![image-20221009100712239](./ns-3-Tracing系统详解/source1.png)
+![image-20221009100712239]({{ site.url }}/assets/source1.png)
 
 点击All TraceSources会看到ns-3中所有的跟踪源，找到自己想要的那个即可。
 
@@ -152,21 +158,21 @@ Ptr<MobilityModel> mobilityModel = node->GetObject<MobilityModel> ()
 
 在所有跟踪源中找到你想要的之后点击进去，比如MobilityModel点进去如下图，会看到一个描述后面有个More...如下图，点击后会跳到下面。
 
-![image-20221009100302754](./ns-3-Tracing系统详解/config1.png)
+![image-20221009100302754]({{ site.url }}/assets/config1.png)
 
 跳转之后如图：
 
-![image-20221009100604554](./ns-3-Tracing系统详解/config2.png)
+![image-20221009100604554]({{ site.url }}/assets/config2.png)
 
 这样就找到了配置路径
 
 ### 3.回调函数的返回类型与参数
 
-![image-20221009135000602](./ns-3-Tracing系统详解/signature1.png)
+![image-20221009135000602]({{ site.url }}/assets/signature1.png)
 
 在刚刚的配置路径下面找到回调签名，并点击相关链接跳转，找到
 
-![image-20221009135211981](./ns-3-Tracing系统详解/signature2.png)
+![image-20221009135211981]({{ site.url }}/assets/signature2.png)
 
 ```c++
 typedef void(* ns3::MobilityModel::TracedCallback) (Ptr< const MobilityModel > model)

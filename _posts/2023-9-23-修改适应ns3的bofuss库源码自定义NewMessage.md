@@ -1,7 +1,14 @@
 ---
-title: 修改适应ns3的bofuss库源码--自定义NewMessage
-date: 2023-08-24 15:48:50
+layout:     post
+title: 修改适应ns3的bofuss库源码之自定义NewMessage
+subtitle:  自定义NewMessage
+date:       2023-9-23
+author:     MZ
+header-img: img/post-bg-universe.jpg
+catalog: true
 tags:
+    - ns3
+    - SDN
 ---
 
 # 自定义NewMessage

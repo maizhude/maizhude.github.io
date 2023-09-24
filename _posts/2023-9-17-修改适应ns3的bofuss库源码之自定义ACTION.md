@@ -1,7 +1,14 @@
 ---
-title: 修改适应ns3的bofuss库源码——自定义ACTION
-date: 2023-08-24 15:48:11
+layout:     post
+title: 修改适应ns3的bofuss库源码之自定义ACTION
+subtitle:  自定义action
+date:       2023-9-17
+author:     MZ
+header-img: img/post-bg-miui6.jpg
+catalog: true
 tags:
+    - ns3
+    - SDN
 ---
 
 # 自定义Action

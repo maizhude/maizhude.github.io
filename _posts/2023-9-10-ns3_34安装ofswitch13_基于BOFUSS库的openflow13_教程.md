@@ -2,9 +2,9 @@
 layout:     post
 title: ns3.34安装ofswitch13（基于BOFUSS库的openflow13）教程
 subtitle:  ns3
-date:       2023-8-20
+date:       2023-9-10
 author:     MZ
-header-img: img/post-bg-cook.jpg
+header-img: img/post-bg-kuaidi.jpg
 catalog: true
 tags:
     - ns3
@@ -75,8 +75,8 @@ patch -p1 < contrib/ofswitch13/utils/ofswitch13-doc-3_34.patch
 >
 > ![img]({{ site.url }}/assets/OFSwitch-successful-configuration.png)
 >
-> ![img](./ns3-34安装ofswitch13（基于BOFUSS库的openflow13）教程/OFSwitch13-enabled.png)
+> ![img]({{ site.url }}/assets/OFSwitch13-enabled.png)
 
 > 编译之后的正确输出：
 >
-> ![img](./ns3-34安装ofswitch13（基于BOFUSS库的openflow13）教程/OFSwitch-Successful-compile.png)
+> ![img]({{ site.url }}/assets/OFSwitch-Successful-compile.png)
