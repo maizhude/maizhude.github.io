@@ -9,6 +9,7 @@ catalog: true
 tags:
     - ns3
     - SDN
+    - OpenFlow
 ---
 
 # 自定义NewMessage
@@ -37,24 +38,14 @@ enum ofp_type {
 
 ```c++
 /* file:include/openflow/openflow.h 
- * Struct representing the cn. 
+ * Struct representing the cn and cr. 
  */
-struct ofp_que_cn{
+struct ofp_msg_que_cn_cr{
     struct ofp_header header;
     uint16_t queue_length;
-    uint8_t pad[6];
-}
-
-/* file:include/openflow/openflow.h 
- * Struct representing the cr. 
- * All OpenFlow messages are 8 bytes 
- * aligned, thus padding is added
- */
-struct ofp_que_cr{
-    struct ofp_header header;
-    uint16_t queue_length;
-    uint8_t pad[6];
-}
+    uint32_t port_no;
+    uint8_t pad[2];
+};
 ```
 
 ### 3.定义新消息的交换机内部数据呈现格式
@@ -71,11 +62,12 @@ struct ofl_msg_header {
  * Internal representation of 
  * OFPT_QUE_CN and OFPT_QUE_CR.
  */ 
-struct ofp_que_cn_cr{
-    struct ofp_header header;
+struct ofl_msg_que_cn_cr{
+    struct ofl_msg_header header;
     uint16_t queue_length;
-    uint8_t pad[6];
-}
+    uint32_t port_no;
+    uint8_t pad[2];
+};
 ```
 
 ### 4.定义新消息的Openflow格式与交换机内部格式转换规则（pack与unpack）
@@ -93,6 +85,7 @@ ofl_msg_pack_que_cn_cr(struct ofl_msg_que_cn_cr *msg, uint8_t **buf, size_t *buf
         rep = (struct ofp_que_cn_cr *)(*buf);
         /* It is important to set the variables in network order */
         rep->queue_length =  htons(msg->queue_length);
+        rep->port_no =  htons(msg->port_no);
         memset(rep->pad,0,sizeof(rep->pad));
         return 0;
 }
@@ -147,6 +140,7 @@ ofl_msg_unpack_que_cn_cr(struct ofp_header *src, size_t *len, struct ofl_msg_hea
     irep = (struct ofl_que_cn_cr *) malloc(sizeof(struct ofl_que_cn_cr));
 
     irep->queue_length = ntohs(rep->queue_length);
+    irep->port_no = ntohs(rep->port_no);
     *msg = (struct ofl_msg_header *)irep;
     return 0;
 }
