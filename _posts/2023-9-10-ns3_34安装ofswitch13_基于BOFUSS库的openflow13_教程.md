@@ -50,7 +50,7 @@ git clone https://github.com/ljerezchaves/ofsoftswitch13.git
 cd /home/your-home/ns-allinone-3.34/ns-3.34/contrib/ofswitch13/lib/ofsoftswitch13
 git checkout v5.0.x
 ./boot.sh
-./configure –enable-ns3-lib
+./configure --enable-ns3-lib
 make -j8
 ```
 
