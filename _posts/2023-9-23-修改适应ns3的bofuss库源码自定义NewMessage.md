@@ -193,12 +193,216 @@ ofl_msg_unpack(uint8_t *buf, size_t buf_len, struct ofl_msg_header **msg, uint32
 }
 ```
 
-## 二、在交换机端处理新消息——待完成（需要找到哪里记录队列长度，并从这里构建消息发送到控制器）
 
-### 1.获取队列长度
 
-因为ofswitch13只有一个OFSwitch13PriorityQueue实现，而且它继承的是Queue，Queue有一个GetNPackets()方法，返回的是The number of packets currently stored in the Queue，也就是队列里的数据包长度（当然也可以用GetNBytes()返回字节数）。
+## 二、在交换机端获取队列构建新消息
 
-### 2.判断并发送消息到控制器
+### 1.交换机获取队列长度
 
-根据规则定时查询队列长度，大于某一阈值发送消息到控制器。在OFSwitch13Device中有一个SendToController方法，但是它发送的好像是数据包格式，现在不知道需不需要把自己想要传输的数据转换成数据包格式。
+> 因为ofswitch13只有一个OFSwitch13PriorityQueue实现，而且它继承的是Queue，Queue有一个GetNPackets()方法，返回的是The number of packets currently stored in the Queue，也就是队列里的数据包长度（当然也可以用GetNBytes()返回字节数）。
+
+```C++
+/**
+ * @brief 定时查询交换机队列长度
+ * 
+ * @param openFlowDev OFSwitch13Device
+ */
+void QueryAllQueLength(Ptr<OFSwitch13Device> openFlowDev) {
+  //获取交换机的端口数量
+  size_t portSize = openFlowDev->GetSwitchPortSize();
+  uint64_t dpid = openFlowDev->GetDpId();
+  for(uint32_t i = 0; i < portSize; i++){
+    Ptr<OFSwitch13Port> ofPort = openFlowDev->GetSwitchPort(i+1);
+    Ptr<OFSwitch13Queue> ofQue = ofPort->GetPortQueue();
+    uint16_t queueLength = ofQue->GetNPackets();
+    uint16_t state = ofPort->GetCongestionState();
+    uint16_t count = ofPort->GetCongestionRecoverCount();
+    uint32_t port_no = i+1;
+    //判断是否大于阈值
+    if(queueLength > 20){
+      // NS_LOG_INFO("The Port " << i+1 << " queueLength is " << queueLength);
+      if(state == 0){
+        state = 1;
+        ofPort->SetCongestionState(state);
+      }
+      openFlowDev->SendQueueCongestionNotifyMessage(dpid,queueLength,port_no);
+      count = 0;
+      ofPort->SetCongestionRecoverCount(count);
+    }else{
+      if(state == 1){
+        count++;
+        ofPort->SetCongestionRecoverCount(count);
+      }
+      if(count == 3){
+        openFlowDev->SendQueueCongestionRecoverMessage(dpid,queueLength,port_no);
+        // NS_LOG_INFO("The count is " << count);
+        count = 0;
+        state = 0;
+        ofPort->SetCongestionRecoverCount(count);
+        ofPort->SetCongestionState(state);
+      }
+    }
+    //OFSwitch13Device构造发送函数，发送到控制器
+  }
+  
+  // Reschedule the function call
+  Time delay = MicroSeconds(10); // Set the desired time interval
+  Simulator::Schedule(delay, &QueryAllQueLength, openFlowDev);
+}
+```
+
+### 2.交换机构建新消息
+
+> 在OFSwitch13Device（相当于一个交换机设备）中，定义SendQueueCongestionNotifyMessage函数用来构建openflow消息包括消息头和消息体
+>
+> ```c++
+>  struct ofl_msg_que_cn_cr msg;
+>   msg.header.type = OFPT_QUE_CN;
+>   msg.queue_length = queueLength;
+>   msg.port_no = port_no;
+> ```
+>
+> 通过datapath的dp_send_message发送到控制器
+
+```C++
+int
+OFSwitch13Device::SendQueueCongestionNotifyMessage (uint64_t dpid, uint16_t queueLength, uint32_t port_no)
+{
+  NS_LOG_FUNCTION (this << queueLength);
+  Ptr<OFSwitch13Device> openFlowDev = GetDevice(dpid);
+  Ptr<RemoteController> remoteCtrl = openFlowDev->GetFirstRemoteController();
+  // Create the packet_in message.
+  struct ofl_msg_que_cn_cr msg;
+  msg.header.type = OFPT_QUE_CN;
+  msg.queue_length = queueLength;
+  msg.port_no = port_no;
+  // struct sender senderCtrl;
+  // senderCtrl.remote = remoteCtrl->m_remote;
+  // senderCtrl.conn_id = 0; // TODO No support for auxiliary connections.
+  // senderCtrl.xid = 0;
+  return dp_send_message (m_datapath, (struct ofl_msg_header *)&msg, 0);
+}
+```
+
+## 三、在控制器处理新消息
+
+> 首先判断属于哪个消息，在HandleSwitchMsg中增加两个case：OFPT_QUE_CN和OFPT_QUE_CR
+
+```C++
+ofl_err
+OFSwitch13Controller::HandleSwitchMsg (
+  struct ofl_msg_header *msg, Ptr<RemoteSwitch> swtch, uint32_t xid)
+{
+  NS_LOG_FUNCTION (this << swtch << xid);
+
+  // Dispatches control messages to appropriate handler functions.
+  switch (msg->type)
+    {
+    case OFPT_HELLO:
+      return HandleHello (msg, swtch, xid);
+
+    case OFPT_PACKET_IN:
+      return HandlePacketIn (
+        (struct ofl_msg_packet_in*)msg, swtch, xid);
+    //......
+    case OFPT_QUE_CN:
+      return HandleQueCn (
+        (struct ofl_msg_que_cn_cr*)msg, swtch, xid);
+    case OFPT_QUE_CR:
+      return HandleQueCr (
+        (struct ofl_msg_que_cn_cr*)msg, swtch, xid);
+    //......
+    case OFPT_EXPERIMENTER:
+    default:
+      return ofl_error (OFPET_BAD_REQUEST, OFPGMFC_BAD_TYPE);
+    }
+}
+```
+
+它们的函数声明在ofswitch13-controller.h与ofswitch13-tsfcc-controller.h中
+
+```C++
+/* ofswitch13-controller.h */
+virtual ofl_err HandleQueCn (
+    struct ofl_msg_que_cn_cr *msg, Ptr<const RemoteSwitch> swtch,
+    uint32_t xid);
+
+virtual ofl_err HandleQueCr (
+    struct ofl_msg_que_cn_cr *msg, Ptr<const RemoteSwitch> swtch,
+    uint32_t xid);
+/* ofswitch13-controller.cc */
+ofl_err
+OFSwitch13Controller::HandleQueCn (
+  struct ofl_msg_que_cn_cr *msg, Ptr<const RemoteSwitch> swtch,
+  uint32_t xid)
+{
+  NS_LOG_FUNCTION (this << swtch << xid);
+
+  ofl_msg_free ((struct ofl_msg_header*)msg, 0);
+  return 0;
+}
+
+ofl_err
+OFSwitch13Controller::HandleQueCr (
+  struct ofl_msg_que_cn_cr *msg, Ptr<const RemoteSwitch> swtch,
+  uint32_t xid)
+{
+  NS_LOG_FUNCTION (this << swtch << xid);
+
+  ofl_msg_free ((struct ofl_msg_header*)msg, 0);
+  return 0;
+}
+```
+
+```c++
+/* ofswitch13-tsfcc-controller.h */  
+ofl_err HandleQueCn (
+    struct ofl_msg_que_cn_cr *msg, Ptr<const RemoteSwitch> swtch,
+    uint32_t xid);
+
+  ofl_err HandleQueCr (
+    struct ofl_msg_que_cn_cr *msg, Ptr<const RemoteSwitch> swtch,
+    uint32_t xid);
+
+/* ofswitch13-tsfcc-controller.cc */
+
+/**
+ * @brief 用于处理队列超过阈值接收到的OpenFlow消息，流程为：先区分象鼠流，再根据队列长度判断进行哪一种拥塞控制方案
+ * 
+ * @param msg OpenFlow消息
+ * @param swtch 交换机
+ * @param xid xid
+ * @return ofl_err 错误结构体
+ */
+ofl_err
+OFSwitch13TsfccController::HandleQueCn (
+  struct ofl_msg_que_cn_cr *msg, Ptr<const RemoteSwitch> swtch,
+  uint32_t xid)
+{
+  NS_LOG_FUNCTION (this << swtch << xid);
+  //自己定义实现
+  
+  ofl_msg_free ((struct ofl_msg_header*)msg, 0);
+  return 0;
+}
+/**
+ * @brief 用于处理接收到队列长度恢复到阈值以下的OpenFlow消息，流程为：先区分象鼠流，再根据BDP等对象鼠流进行不同的rwnd值的增加
+ * 
+ * @param msg OpenFlow消息
+ * @param swtch 交换机
+ * @param xid xid
+ * @return ofl_err 错误结构体
+ */
+ofl_err
+OFSwitch13TsfccController::HandleQueCr (
+  struct ofl_msg_que_cn_cr *msg, Ptr<const RemoteSwitch> swtch,
+  uint32_t xid)
+{
+  NS_LOG_FUNCTION (this << swtch << xid);
+
+  //自己定义实现
+  ofl_msg_free ((struct ofl_msg_header*)msg, 0);
+  return 0;
+}
+```
+
