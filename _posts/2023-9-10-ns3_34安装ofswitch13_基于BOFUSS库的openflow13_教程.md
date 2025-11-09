@@ -1,11 +1,12 @@
 ---
 layout:     post
 title: ns3.34安装ofswitch13（基于BOFUSS库的openflow13）教程
-subtitle:  ns3
 date:       2023-9-10
 author:     MZ
 header-img: img/post-bg-kuaidi.jpg
 catalog: true
+categories:
+    - NS3
 tags:
     - ns3
     - SDN

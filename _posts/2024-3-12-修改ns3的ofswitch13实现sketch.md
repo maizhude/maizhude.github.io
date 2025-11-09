@@ -1,11 +1,12 @@
 ---
 layout:     post
 title: 修ns3的ofswitch13源码之实现Sketch
-subtitle:  实现Sketch
 date:       2024-3-12
 author:     MZ
 header-img: img/post-bg-swift.jpg
 catalog: true
+categories:
+    - NS3
 tags:
     - ns3
     - SDN

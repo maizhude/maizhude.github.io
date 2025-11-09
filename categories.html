@@ -1,0 +1,107 @@
+---
+title: Categories
+layout: default
+description: keep hungry keep foolish
+header-img: "img/tag-bg.jpg"
+---
+
+<!-- Page Header -->
+<header class="intro-header" style="background-image: url('{{ site.baseurl }}/{% if page.header-img %}{{ page.header-img }}{% else %}{{ site.header-img }}{% endif %}')">
+  <div class="container">
+    <div class="row">
+      <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+        <div class="site-heading" id="category-heading">
+          <h1>{% if page.title %}{{ page.title }}{% else %}{{ site.title }}{% endif %}</h1>
+          <span class="subheading">{{ page.description }}</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</header>
+
+<!-- Main Content -->
+<div class="container">
+  <div class="row">
+    <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+
+      <!-- 分类云 -->
+      <div id="category_cloud" class="tags">
+        {% for category in site.categories %}
+          <a href="{{ site.baseurl }}/categories/{{ category[0] | slugify }}/" title="{{ category[0] }}" rel="{{ category[1].size }}">{{ category[0] }}</a>
+        {% endfor %}
+      </div>
+
+      <hr>
+
+      <!-- 分类列表 -->
+      <div id="category-list">
+      {% for cat in site.categories %}
+        {% assign category_name = cat[0] %}
+        {% assign posts = cat[1] %}
+        <div class="category-block">
+          <div class="category-header" onclick="toggleCategory('{{ category_name }}')">
+            <span class="fa fa-folder"></span>
+            <span class="category-name">{{ category_name }}</span>
+            <span class="post-count">({{ posts.size }})</span>
+          </div>
+          <div class="category-posts" id="cat-{{ category_name }}" style="display: none;">
+            {% for post in posts %}
+            <div class="post-preview">
+              <a href="{{ post.url | prepend: site.baseurl }}">
+                <h4 class="post-title">{{ post.title }}</h4>
+              </a>
+            </div>
+            {% endfor %}
+          </div>
+        </div>
+      {% endfor %}
+    </div>
+
+    </div>
+  </div>
+</div>
+<script>
+function toggleCategory(cat) {
+  var div = document.getElementById('cat-' + cat);
+  if (div.style.display === 'none') {
+    div.style.display = 'block';
+  } else {
+    div.style.display = 'none';
+  }
+}
+</script>
+<style>
+.category-block {
+  border-bottom: 1px solid #eee;
+  margin-bottom: 10px;
+  padding: 5px 0;
+}
+
+.category-header {
+  cursor: pointer;
+  font-weight: bold;
+  font-size: 18px;
+  display: flex;
+  align-items: center;
+  color: #333;
+}
+
+.category-header:hover {
+  color: #0085a1;
+}
+
+.category-name {
+  margin-left: 5px;
+}
+
+.post-count {
+  margin-left: 8px;
+  color: #999;
+  font-size: 14px;
+}
+
+.category-posts {
+  margin-left: 20px;
+  margin-top: 5px;
+}
+</style>

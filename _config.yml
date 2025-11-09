@@ -41,8 +41,20 @@ anchorjs: true                          # if you want to customize anchor. check
 # from PR#40, to support local preview for Jekyll 3.0
 gems: [jekyll-paginate]
 #paginate: 12
-plugins: [jekyll-paginate]
+plugins:
+  - jekyll-paginate
+  - jekyll-compose
 
+jekyll_compose:
+  default_front_matter:
+    posts:
+      layout: post
+      author: MZ
+      header-img: img/post-bg-coffee.jpg
+      catalog: true
+      categories: [未分类]
+      tags:
+        - 未定义标签
 
 # Markdown settings
 # replace redcarpet to kramdown,

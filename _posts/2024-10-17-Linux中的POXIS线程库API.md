@@ -1,11 +1,12 @@
 ---
 layout:     post
 title: Linux中的POXIS线程库API
-subtitle:  POXIS线程API
 date:       2024-10-17
 author:     MZ
 header-img: img/post-bg-keybord.jpg
 catalog: true
+categories:
+    - Linux应用篇
 tags:
     - Linux
     - POXIS

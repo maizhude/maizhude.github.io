@@ -1,11 +1,12 @@
 ---
 layout:     post
 title:     ns3 Tracing系统详解
-subtitle:  ns3
 date:       2022-9-20
 author:     MZ
 header-img: img/post-bg-2015.jpg
 catalog: true
+categories:
+    - NS3
 tags:
     - ns3
 ---
