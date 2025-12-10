@@ -2,7 +2,7 @@
 layout:     post
 title: Linux中的POXIS线程库API
 date:       2024-10-17
-author:     MZ
+author:     WHX
 header-img: img/post-bg-keybord.jpg
 catalog: true
 categories:

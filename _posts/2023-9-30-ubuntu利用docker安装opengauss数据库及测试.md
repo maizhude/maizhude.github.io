@@ -3,7 +3,7 @@ layout:     post
 title: ubuntu利用docker安装opengauss数据库及测试
 subtitle:  ubuntu利用docker安装opengauss数据库及测试
 date:       2023-9-30
-author:     MZ
+author:     WHX
 header-img: img/post-bg-rwd.jpg
 catalog: true
 tags:

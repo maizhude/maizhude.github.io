@@ -2,7 +2,7 @@
 layout:     post
 title:     ns3 Tracing系统详解
 date:       2022-9-20
-author:     MZ
+author:     WHX
 header-img: img/post-bg-2015.jpg
 catalog: true
 categories:

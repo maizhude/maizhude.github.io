@@ -2,7 +2,7 @@
 layout:     post
 title: 修改适应ns3的bofuss库源码之自定义NewMessage
 date:       2023-9-23
-author:     MZ
+author:     WHX
 header-img: img/post-bg-universe.jpg
 catalog: true
 categories:
