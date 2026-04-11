@@ -50,7 +50,7 @@ jekyll_compose:
     posts:
       layout: post
       author: WHX
-      header-img: img/post-bg-coffee.jpg
+      header-img: img/post-bg-coffee.jpeg
       catalog: true
       categories: [未分类]
       tags:
